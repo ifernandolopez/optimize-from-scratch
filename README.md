@@ -1,2 +1,2 @@
-# optimize-for-scratch
-Optimization alforithms for scratch
+# Optimization algorithms for scratch
+This project contains the detailed implementation of some of the algorithms and examples that I use in my classes at UNIR (Universidad Internacional de la Rioja).
