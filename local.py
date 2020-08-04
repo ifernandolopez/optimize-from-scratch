@@ -106,22 +106,23 @@ def sa(start_sol, domains, cost_fn, neighbors_fn, T=100000.0, cool_factor = 0.99
     T - initial temperature
     cool_factor - according to the formula t = cool_factor*t """
     best_sol = sol = np.array(start_sol)
-    best_E = cost_fn(best_sol)
+    best_E = Ea = cost_fn(sol)
     while (T>0.1):
         # Choice a random neighbor  sol
         neighbors = neighbors_fn(domains, sol)
         next_sol = random.choice(neighbors)
-        # Calculate current and next energy
-        Ea = cost_fn(sol)
+        # Calculate next energy
         Eb = cost_fn(next_sol)
-        if (Eb < best_E):
-            best_sol = next_sol
-            best_E = Eb
         # Update sol if next_sol has lower cost (p>1)
         # or we pass the probability cutoff
-        p = pow(math.e, (Ea-Eb)/T)
-        if (random.random() < p):
+        p =pow(math.e, (Ea-Eb)/T)
+        if (np.random.uniform() < p):
             sol = next_sol
+            Ea = Eb
+            # Save the best ever found
+            if (Eb < best_E):
+                best_sol = next_sol
+                best_E = Eb
         # Decrease temperature
         T = cool_factor * T
     return (best_E, list(best_sol))
