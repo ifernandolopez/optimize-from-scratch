@@ -106,7 +106,7 @@ def sa(start_sol, domains, cost_fn, neighbors_fn, T=100000.0, cool_factor = 0.99
     T - initial temperature
     cool_factor - according to the formula t = cool_factor*t """
     best_sol = sol = np.array(start_sol)
-    best_E = Ea = cost_fn(sol)
+    best_E = Ea = cost_fn(start_sol)
     while (T>0.1):
         # Choice a random neighbor  sol
         neighbors = neighbors_fn(domains, sol)
