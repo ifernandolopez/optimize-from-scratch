@@ -72,38 +72,40 @@ domains = [(-5.0,5.0)] * dimensions
 start_sol = [np.random.uniform(domain[0],domain[1])for domain in domains]
 gd_advances = [10.0, 5.0, 1.0, 0.5, 0.1, 0.01, 0.001]
 
-res = exhaustive.fss(space, sphere_cost)
-print_solution("Sphere fss", res)
 
-res = exhaustive.fds(domains, step, sphere_cost)
-print_solution("Sphere fds", res)
+if (__name__ == "__main__"):
+    res = exhaustive.fss(space, sphere_cost)
+    print_solution("Sphere fss", res)
 
-res = exhaustive.fss(space, rastigin_cost)
-print_solution("Rastigin fss", res)
+    res = exhaustive.fds(domains, step, sphere_cost)
+    print_solution("Sphere fds", res)
 
-res = exhaustive.fds(domains, step, rastigin_cost)
-print_solution("Rastigin fds", res)
+    res = exhaustive.fss(space, rastigin_cost)
+    print_solution("Rastigin fss", res)
 
-res = montecarlo.rs(domains, sphere_cost, 100000, False)
-print_solution("Sphere rs", res)
+    res = exhaustive.fds(domains, step, rastigin_cost)
+    print_solution("Rastigin fds", res)
 
-res = montecarlo.rs(domains, rastigin_cost, 100000, False)
-print_solution("Rastigin rs", res)
+    res = montecarlo.rs(domains, sphere_cost, 100000, False)
+    print_solution("Sphere rs", res)
 
-res = local.dgd(start_sol, sphere_cost, sphere_gradient)
-print_solution("Sphere dgd", res)
+    res = montecarlo.rs(domains, rastigin_cost, 100000, False)
+    print_solution("Rastigin rs", res)
 
-res = local.bgd(start_sol, sphere_cost, sphere_gradient, gd_advances)
-print_solution("Sphere bgd", res)
+    res = local.dgd(start_sol, sphere_cost, sphere_gradient)
+    print_solution("Sphere dgd", res)
 
-res = local.dgd(start_sol, rastigin_cost, rastigin_gradient)
-print_solution("Rantingin dgd", res)
+    res = local.bgd(start_sol, sphere_cost, sphere_gradient, gd_advances)
+    print_solution("Sphere bgd", res)
 
-res = local.bgd(start_sol, rastigin_cost, rastigin_gradient, gd_advances)
-print_solution("Rantingin bgd", res)
+    res = local.dgd(start_sol, rastigin_cost, rastigin_gradient)
+    print_solution("Rantingin dgd", res)
 
-res = local.sa(start_sol, domains, sphere_cost, grid_neighbors)
-print_solution("Sphere sa", res)
+    res = local.bgd(start_sol, rastigin_cost, rastigin_gradient, gd_advances)
+    print_solution("Rantingin bgd", res)
 
-res = local.sa(start_sol, domains, rastigin_cost, grid_neighbors)
-print_solution("Rastingin sa", res)
+    res = local.sa(start_sol, domains, sphere_cost, grid_neighbors)
+    print_solution("Sphere sa", res)
+
+    res = local.sa(start_sol, domains, rastigin_cost, grid_neighbors)
+    print_solution("Rastingin sa", res)
