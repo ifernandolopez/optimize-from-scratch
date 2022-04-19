@@ -101,14 +101,14 @@ def bgd(start_sol, cost_fn, gradient_fn, advances, tolerance = 0.00001):
     return (best_next_cost, sol)
 
 def sa(start_sol, domains, cost_fn, neighbors_fn, T=100000.0, cool_factor = 0.99):
-    """ Implements simulated anneling
+    """ Implements simulated annealing
     neightbors_fn - function that determines the neighbors
     T - initial temperature
     cool_factor - according to the formula t = cool_factor*t """
     best_sol = sol = np.array(start_sol)
     best_E = Ea = cost_fn(start_sol)
     while (T>0.1):
-        # Choice a random neighbor  sol
+        # Choice a random neighbor sol
         neighbors = neighbors_fn(domains, sol)
         next_sol = random.choice(neighbors)
         # Calculate next energy
@@ -116,7 +116,7 @@ def sa(start_sol, domains, cost_fn, neighbors_fn, T=100000.0, cool_factor = 0.99
         # Update sol if next_sol has lower cost (p>1)
         # or we pass the probability cutoff
         p =pow(math.e, (Ea-Eb)/T)
-        if (np.random.uniform() < p):
+        if (p > 1.0 or p > np.random.uniform()):
             sol = next_sol
             Ea = Eb
             # Save the best ever found
@@ -146,7 +146,7 @@ def ts(start_sol, domains, profit_fn, neighbors_fn, stop_profit, max_it=1000):
                 # Break stagnation keeping only the second part of the vetoed candidates
                 tl = tl[len(tl)//2:]
         # Update the best_sol, if a better candidate is found
-        if (best_profit < best_candidate_profit):
+        if (best_candidate_profit > best_profit):
             best_sol, best_profit = best_candidate, best_candidate_profit
         # If we have reach the stop_profit
         if (best_candidate_profit >= stop_profit):
