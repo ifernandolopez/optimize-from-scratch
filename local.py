@@ -130,11 +130,11 @@ def sa(start_sol, domains, cost_fn, neighbors_fn, T=100000.0, cool_factor = 0.99
 
 def ts(start_sol, domains, cost_fn, neighbors_fn, stop_cost, max_it = 10000, max_tl_len = 100):
     tl = [start_sol]
-    best_sol = current_candidate = start_sol
+    best_sol = current_sol = start_sol
     best_cost = cost_fn(start_sol)
     for i in range(max_it):
-        # Each iteration choses a neighbor of current_candidate
-        neighbors = neighbors_fn(domains, current_candidate)
+        # Each iteration chooses a neighbor of current_sol
+        neighbors = neighbors_fn(domains, current_sol)
         # First tries to choose randomly an un-vetoed candidate: not in the tl
         unvetoed_neighbors = [candidate for candidate in neighbors if candidate not in tl]
         if len(unvetoed_neighbors) > 0:
@@ -152,8 +152,8 @@ def ts(start_sol, domains, cost_fn, neighbors_fn, stop_cost, max_it = 10000, max
         # Update the best_sol, if a better candidate is found
         if next_candidate_cost < best_cost:
             best_sol, best_cost = next_candidate, next_candidate_cost
-        # Anyway, update the current_candidate
-        current_candidate = next_candidate
+        # Anyway, update the current_sol
+        current_sol = next_candidate
         # If we have reach the stop_cost
         if best_cost <= stop_cost:
             break
