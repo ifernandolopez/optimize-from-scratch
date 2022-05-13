@@ -5,6 +5,7 @@
 import math
 import random
 import numpy as np
+import collections
 
 def accuracy_ratio(best_profit, achieved_profit):
     """ Quantifies the accuracy of the approximate solution """
@@ -100,14 +101,14 @@ def bgd(start_sol, cost_fn, gradient_fn, advances, tolerance = 0.00001):
         (sol, cost) = (best_next_sol, best_next_cost)
     return (best_next_cost, sol)
 
-def sa(start_sol, domains, cost_fn, neighbors_fn, T=100000.0, cool_factor = 0.99):
+def sa(start_sol, domains, cost_fn, neighbors_fn, T=100000.0, cool_factor = 0.999):
     """ Implements simulated annealing
     neightbors_fn - function that determines the neighbors
     T - initial temperature
     cool_factor - according to the formula t = cool_factor*t """
     best_sol = sol = np.array(start_sol)
     best_E = Ea = cost_fn(start_sol)
-    while (T>0.1):
+    while (T>0.01):
         # Choice a random neighbor sol
         neighbors = neighbors_fn(domains, sol)
         next_sol = random.choice(neighbors)
@@ -126,34 +127,41 @@ def sa(start_sol, domains, cost_fn, neighbors_fn, T=100000.0, cool_factor = 0.99
         # Decrease temperature
         T = cool_factor * T
     return (best_E, list(best_sol))
-        
-def ts(start_sol, domains, profit_fn, neighbors_fn, stop_profit, max_it=1000):
-    tl = [start_sol]
-    best_sol = best_candidate = start_sol
-    best_profit = profit_fn(start_sol)
-    for i in range(max_it):
-        # Each iteration search for the more profitable neighbor which is not in the tl
-        neighbors = neighbors_fn(domains, best_candidate)
-        best_candidate, best_candidate_profit = None, -np.inf
-        while (best_candidate == None):
-            # Choose an un-vetoed candidate
-            for candidate in neighbors:
-                candidate_profit = profit_fn(candidate)
-                if (candidate not in tl) and (candidate_profit>best_candidate_profit):
-                    best_candidate, best_candidate_profit = candidate, candidate_profit
-            # If all the neighbors are in the tl
-            if (best_candidate == None):
-                # Break stagnation keeping only the second part of the vetoed candidates
-                tl = tl[len(tl)//2:]
-        # Update the best_sol, if a better candidate is found
-        if (best_candidate_profit > best_profit):
-            best_sol, best_profit = best_candidate, best_candidate_profit
-        # If we have reach the stop_profit
-        if (best_candidate_profit >= stop_profit):
-            break
-        # Veto candidate
-        tl.append(best_candidate)
-    return (best_profit, best_sol)
 
-    
+def ts(start_sol, domains, cost_fn, neighbors_fn, stop_cost, max_it = 10000, max_tl_len = 100):
+    tl = [start_sol]
+    best_sol = current_candidate = start_sol
+    best_cost = cost_fn(start_sol)
+    for i in range(max_it):
+        # Each iteration choses a neighbor of current_candidate
+        neighbors = neighbors_fn(domains, current_candidate)
+        # First tries to choose randomly an un-vetoed candidate: not in the tl
+        unvetoed_neighbors = [candidate for candidate in neighbors if candidate not in tl]
+        if len(unvetoed_neighbors) > 0:
+            next_candidate = random.choice(unvetoed_neighbors)
+            next_candidate_cost = cost_fn(next_candidate)
+        # Otherwise uses the aspiration criteria and chooses the best vetoed neighbor
+        else:
+            # next_candidate = max(neighbors, key = cost_fn)
+            # next_candidate_cost = cost_fn(next_candidate)
+            next_candidate, next_candidate_cost = None, np.inf
+            for candidate in neighbors:
+                candidate_cost = cost_fn(candidate)
+                if candidate_cost < next_candidate_cost:
+                    next_candidate, next_candidate_cost = candidate, candidate_cost
+        # Update the best_sol, if a better candidate is found
+        if next_candidate_cost < best_cost:
+            best_sol, best_cost = next_candidate, next_candidate_cost
+        # Anyway, update the current_candidate
+        current_candidate = next_candidate
+        # If we have reach the stop_cost
+        if best_cost <= stop_cost:
+            break
+        # Veto the candidate
+        tl.append(next_candidate)
+        # Limit the size of the tl
+        if len(tl) > max_tl_len:
+            tl = tl[len(tl)//2:]
+    return (best_cost, best_sol)
+
     

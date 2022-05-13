@@ -109,3 +109,9 @@ if (__name__ == "__main__"):
 
     res = local.sa(start_sol, domains, rastigin_cost, grid_neighbors)
     print_solution("Rastingin sa", res)
+
+    res = local.ts(start_sol, domains, sphere_cost, grid_neighbors, stop_cost = 0, max_it=100000)
+    print_solution("Sphere ts", res)
+
+    res = local.ts(start_sol, domains, rastigin_cost, grid_neighbors, stop_cost = 0, max_it=100000)
+    print_solution("Rastingin ts", res)
